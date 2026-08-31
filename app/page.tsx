@@ -1,3 +1,7 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+
 const technologies = [
   "Next.js",
   "Tailwind CSS",
@@ -33,12 +37,37 @@ const fieldClassName =
   "w-full rounded-xl border border-zinc-700 bg-zinc-900/60 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/40";
 
 export default function Home() {
-  async function sendMessage(formData: FormData) {
-    "use server";
-    void formData.get("name");
-    void formData.get("email");
-    void formData.get("service");
-    void formData.get("message");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          email: formData.get("email"),
+          service: formData.get("service"),
+          message: formData.get("message"),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      alert("Mesajınız başarıyla iletildi!");
+      form.reset();
+    } catch {
+      alert("Bir hata oluştu, lütfen tekrar deneyin.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -162,7 +191,7 @@ export default function Home() {
           </p>
 
           <form
-            action={sendMessage}
+            onSubmit={handleSubmit}
             className="mt-12 max-w-xl space-y-5 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md sm:p-8"
           >
             <div className="space-y-2">
@@ -242,9 +271,10 @@ export default function Home() {
 
             <button
               type="submit"
-              className="inline-flex h-12 w-full items-center justify-center rounded-full bg-indigo-500 px-7 text-sm font-semibold text-white shadow-[0_0_24px_rgba(99,102,241,0.45)] transition-colors hover:bg-violet-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 sm:w-auto"
+              disabled={isSubmitting}
+              className="inline-flex h-12 w-full items-center justify-center rounded-full bg-indigo-500 px-7 text-sm font-semibold text-white shadow-[0_0_24px_rgba(99,102,241,0.45)] transition-colors hover:bg-violet-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-indigo-500 sm:w-auto"
             >
-              Mesaj Gönder
+              {isSubmitting ? "Gönderiliyor..." : "Mesaj Gönder"}
             </button>
           </form>
         </section>
