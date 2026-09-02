@@ -9,11 +9,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 export const metadata: Metadata = {
-  title: "Dos Toprak | Portfolio - Web Developer",
+  title: "Dos Toprak | Portfolyo",
   description: "Kişisel web sitesi ve portfolyo",
 };
 
